@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">VKVideoPlayer</string>
+    <string name="serialization_error">Ошибка сериализации</string>
+    <string name="no_internet">Отсутствие подключения к интернету</string>
+    <string name="no_fetching_data">Ничего не нашлось по Вашему запросу</string>
+    <string name="push_back">Вернуться назад</string>
+    <string name="too_long_request">Время ожидания запроса истекло</string>
+</resources>
