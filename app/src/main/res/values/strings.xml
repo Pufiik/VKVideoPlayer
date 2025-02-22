@@ -5,4 +5,12 @@
     <string name="no_fetching_data">Ничего не нашлось по Вашему запросу</string>
     <string name="push_back">Вернуться назад</string>
     <string name="too_long_request">Время ожидания запроса истекло</string>
+    <string name="database_error_insert">Ошибка сохранения данных в базу данных</string>
+    <string name="database_success_insert">Видео успешно сохранено!</string>
+    <string name="database_success_delete">Видео удалено из ваших скачанных</string>
+    <string name="database_error_delete">Ошибка удаления</string>
+    <string name="no_fetching_video">Ошибка получения видео\n</string>
+    <string name="database_success_delete_all">Сохраненные видео успешно удалены. Кэш очищен</string>
+    <string name="no_videos">У вас пока нет скачанных видео</string>
+    <string name="already_download">Видео уже есть в скачанных\n</string>
 </resources>

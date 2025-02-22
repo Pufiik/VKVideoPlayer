@@ -4,13 +4,15 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import androidx.room.TypeConverters
+import ru.pugovishnikova.example.vkvideoplayer.data.local.VideoDao
+import ru.pugovishnikova.example.vkvideoplayer.data.model.database.VideoEntity
+import ru.pugovishnikova.example.vkvideoplayer.util.Utils
+
 
 @Database(entities = [VideoEntity::class], version = 1, exportSchema = false)
 abstract class AppDatabase : RoomDatabase() {
 
-    abstract fun getUserDao(): UserDao
-    abstract fun getPostDao(): PostDao
+    abstract fun getVideoDao(): VideoDao
 
     companion object {
         private var DB_INSTANCE: AppDatabase? = null
@@ -20,8 +22,8 @@ abstract class AppDatabase : RoomDatabase() {
                 DB_INSTANCE = Room.databaseBuilder(
                     context.applicationContext,
                     AppDatabase::class.java,
-                    name = "APP_DB"
-                )   .fallbackToDestructiveMigration()
+                    name = Utils.getAppDatabaseNameString()
+                )
                     .allowMainThreadQueries()
                     .build()
             }

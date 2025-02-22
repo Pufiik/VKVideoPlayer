@@ -25,7 +25,7 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://www.googleapis.com/youtube/v3/\"")
+            buildConfigField("String", "BASE_URL", "\"https://gist.githubusercontent.com/poudyalanil/ca84582cbeb4fc123a13290a586da925/raw/14a27bd0bcd0cd323b35ad79cf3b493dddf6216b/\"")
             buildConfigField("String", "DOWNLOAD_URL", "\"https://www.youtube.com/watch?v=\"")
             buildConfigField(
                 "String",
@@ -123,4 +123,5 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.chromecast.sender)
 }

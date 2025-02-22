@@ -1,4 +1,4 @@
-package ru.pugovishnikova.example.vkvideoplayer.data.mappers
+package ru.pugovishnikova.example.vkvideoplayer.data.mappers.api
 
 import ru.pugovishnikova.example.vkvideoplayer.data.model.api.ContentDetails
 import ru.pugovishnikova.example.vkvideoplayer.data.model.api.ContentDetailsDto

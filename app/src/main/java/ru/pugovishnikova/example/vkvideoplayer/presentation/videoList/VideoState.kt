@@ -5,4 +5,5 @@ data class VideoState(
     val videos: List<VideoUi> = emptyList(),
     val selectedVideoUi: VideoUi? = null,
     val isError: Boolean = false,
+    val isOnPause: Boolean = false,
 )

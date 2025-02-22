@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.1"
+chromecastSender = "0.28"
 hiltAndroid = "2.52"
 hiltCompiler = "1.2.0"
 loggingInterceptor = "4.9.3"
@@ -28,6 +29,7 @@ ksp = "2.0.20-1.0.24"
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-hilt-compiler = { module = "androidx.hilt:hilt-compiler", version.ref = "hiltCompiler" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltCompiler" }
+chromecast-sender = { module = "com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender", version.ref = "chromecastSender" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
