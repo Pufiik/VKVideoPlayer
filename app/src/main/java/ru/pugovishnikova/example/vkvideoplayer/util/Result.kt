@@ -34,13 +34,3 @@ inline fun <T, E: Error> Result<T, E>.onError(action: (E) -> Unit): Result<T, E>
     }
 }
 
-fun <T, E : Error> List<Result<List<T>, E>>.combineResults(): Result<List<T>, E> {
-    val successResults = this.filterIsInstance<Result.Success<List<T>>>()
-    val errorResults = this.filterIsInstance<Result.Error<E>>()
-
-    return if (errorResults.isNotEmpty()) {
-        Result.Error(errorResults.first().error)
-    } else {
-        Result.Success(successResults.flatMap { it.data })
-    }
-}

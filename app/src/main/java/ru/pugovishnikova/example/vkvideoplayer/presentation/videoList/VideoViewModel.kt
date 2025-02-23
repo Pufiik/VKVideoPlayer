@@ -8,6 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.onStart
@@ -17,26 +18,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
-import ru.pugovishnikova.example.vkvideoplayer.data.mappers.database.toVideoEntity
 import ru.pugovishnikova.example.vkvideoplayer.data.mappers.database.toVideoUi
 import ru.pugovishnikova.example.vkvideoplayer.domain.UseCases
 import ru.pugovishnikova.example.vkvideoplayer.domain.util.DownloadError
-import ru.pugovishnikova.example.vkvideoplayer.util.Utils
 import ru.pugovishnikova.example.vkvideoplayer.util.onError
 import ru.pugovishnikova.example.vkvideoplayer.util.onSuccess
 import javax.inject.Inject
-
 @HiltViewModel
 class VideoViewModel @Inject constructor(
     private val useCases: UseCases,
-    val player: Player
+    val player: Player,
 ) : ViewModel() {
 
     private var videoJob: Job? = null
-    private var videoJobDatabase: Job? = null
     private val _state = MutableStateFlow(VideoState())
     private val _events = Channel<VideoListEvent>()
-    private var currentTrackIndex: Int = 0
 
     val events = _events.receiveAsFlow()
 
@@ -57,41 +53,44 @@ class VideoViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         selectedVideoUi = action.track
+
                     )
                 }
                 action.navigate()
+                playVideo()
             }
 
             is VideoAction.OnBackClick -> {
-                action.navigate()
                 player.stop()
+                action.navigate()
             }
         }
     }
 
-    val reload: (Boolean) -> Unit = { isInternet ->
-        if (isInternet) getVideos()
-        else getVideosFromDatabase()
+
+    fun reload(param: Boolean) {
+        if (param) getVideosFromDatabase()
+        else getVideos()
     }
 
     private fun getVideos() {
         _state.update {
             it.copy(
                 isLoading = true,
-                isError = false
+                isInDownloadScreen = false
             )
         }
         videoJob?.cancel()
         videoJob = viewModelScope.launch {
+            delay(1500L)
             withTimeout(5000L) {
                 withContext(Dispatchers.IO) {
                     useCases.getVideosUseCase.invoke().onSuccess { videos ->
                         _state.update {
                             it.copy(
                                 isLoading = false,
-                                videos = videos.map { video ->
-                                    video.toVideoUi()
-                                }
+                                videos = videos,
+                                isFirstLoading = false
                             )
                         }
                     }
@@ -99,7 +98,8 @@ class VideoViewModel @Inject constructor(
                             _state.update {
                                 it.copy(
                                     isLoading = false,
-                                    isError = true
+                                    videos = emptyList(),
+                                    isFirstLoading = false
                                 )
                             }
                             _events.send(VideoListEvent.ErrorEventNetwork(error))
@@ -110,23 +110,34 @@ class VideoViewModel @Inject constructor(
         }
     }
 
-    private fun addVideo(item: MediaItem) {
-        player.addMediaItem(item)
-    }
-
-    fun playVideo() {
+    private fun playVideo() {
         val mediaItems = state.value.videos.map { MediaItem.fromUri(it.url) }
-        player.addMediaItems(mediaItems)
+        player.clearMediaItems()
         val video = state.value.selectedVideoUi
         val position = state.value.videos.indexOf(video)
+        _state.update {
+            it.copy(
+                videoPosition = position
+            )
+        }
         player.setMediaItems(mediaItems, position, 0)
         player.prepare()
         player.play()
     }
 
+    fun update(pos: Int) {
+        val newVideo = state.value.videos[pos]
+        _state.update {
+            it.copy(
+                selectedVideoUi = newVideo
+            )
+        }
+        playVideo()
+    }
+
     private fun cacheVideo(video: VideoUi) {
-        videoJobDatabase?.cancel()
-        videoJobDatabase = viewModelScope.launch {
+        videoJob?.cancel()
+        videoJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 useCases.cacheVideoUseCase(video)
             }.onSuccess { success ->
@@ -138,9 +149,8 @@ class VideoViewModel @Inject constructor(
     }
 
     fun deleteVideo(video: VideoUi) {
-        deleteAllVideos()
-        videoJobDatabase?.cancel()
-        videoJobDatabase = viewModelScope.launch {
+        videoJob?.cancel()
+        videoJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 useCases.deleteVideoUseCase(video)
             }.onSuccess { success ->
@@ -152,11 +162,12 @@ class VideoViewModel @Inject constructor(
     }
 
     private fun getVideosFromDatabase() {
-        videoJobDatabase?.cancel()
-        videoJobDatabase = viewModelScope.launch {
+        videoJob?.cancel()
+        videoJob = viewModelScope.launch {
             _state.update {
                 it.copy(
-                    isError = false
+                    isInDownloadScreen = true,
+                    isFirstLoading = false
                 )
             }
             withContext(Dispatchers.IO) {
@@ -165,16 +176,16 @@ class VideoViewModel @Inject constructor(
                 if (videos.isEmpty()) _events.send(VideoListEvent.ErrorDownloadData(DownloadError.NO_VIDEOS))
                 _state.update {
                     it.copy(
+                        isFirstLoading = false,
                         isLoading = false,
                         videos = videos.map { video -> video.toVideoUi() },
-                        isError = false
                     )
                 }
             }.onError { error ->
                 _state.update {
                     it.copy(
+                        isFirstLoading = false,
                         isLoading = false,
-                        isError = true
                     )
                 }
                 _events.send(VideoListEvent.ErrorEventDatabase(error))
@@ -183,13 +194,8 @@ class VideoViewModel @Inject constructor(
     }
 
     fun getVideoFromDatabase(id: String) {
-        videoJobDatabase?.cancel()
-        videoJobDatabase = viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isError = false
-                )
-            }
+        videoJob?.cancel()
+        videoJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 useCases.getVideoFromDatabaseUseCase(id)
             }.onSuccess {
@@ -198,23 +204,16 @@ class VideoViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        isError = true
                     )
                 }
                 cacheVideo(state.value.selectedVideoUi!!)
-//                _events.send(VideoListEvent.ErrorEventDatabase(error))
             }
         }
     }
 
     private fun deleteAllVideos() {
-        videoJobDatabase?.cancel()
-        videoJobDatabase = viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    isError = false
-                )
-            }
+        videoJob?.cancel()
+        videoJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 useCases.deleteAllVideosUseCase()
                     .onSuccess { success ->

@@ -1,8 +1,5 @@
 package ru.pugovishnikova.example.vkvideoplayer.presentation.videoList
-
-import ru.pugovishnikova.example.vkvideoplayer.BuildConfig
 import ru.pugovishnikova.example.vkvideoplayer.data.model.api.Video
-import ru.pugovishnikova.example.vkvideoplayer.data.model.api.YouTubeVideo
 import ru.pugovishnikova.example.vkvideoplayer.util.Utils
 
 data class VideoUi(
@@ -25,5 +22,5 @@ fun Video.toVideoUi() = VideoUi(
 )
 
 fun String.checkUrl(): String {
-    return if (this.contains("http:")) return "https" + this.substring(4) else this
+    return if (this.contains(Utils.getHttpString())) return Utils.getHttpsString() + this.substring(4) else this
 }

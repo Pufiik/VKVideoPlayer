@@ -4,6 +4,7 @@ data class VideoState(
     val isLoading: Boolean = false,
     val videos: List<VideoUi> = emptyList(),
     val selectedVideoUi: VideoUi? = null,
-    val isError: Boolean = false,
-    val isOnPause: Boolean = false,
+    val isInDownloadScreen: Boolean = false,
+    val videoPosition: Int = -1,
+    val isFirstLoading: Boolean = true
 )

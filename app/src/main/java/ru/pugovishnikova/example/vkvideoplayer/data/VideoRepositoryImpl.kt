@@ -1,8 +1,6 @@
 package ru.pugovishnikova.example.vkvideoplayer.data
 
 import ru.pugovishnikova.example.vkvideoplayer.data.local.VideoDao
-import ru.pugovishnikova.example.vkvideoplayer.data.mappers.database.toVideoUi
-import ru.pugovishnikova.example.vkvideoplayer.data.model.api.Video
 import ru.pugovishnikova.example.vkvideoplayer.data.model.database.VideoEntity
 import ru.pugovishnikova.example.vkvideoplayer.data.remote.ApiService
 import ru.pugovishnikova.example.vkvideoplayer.domain.VideoRepository
@@ -11,18 +9,20 @@ import ru.pugovishnikova.example.vkvideoplayer.domain.util.DatabaseSuccess
 import ru.pugovishnikova.example.vkvideoplayer.domain.util.NetworkError
 import ru.pugovishnikova.example.vkvideoplayer.domain.util.responseToResult
 import ru.pugovishnikova.example.vkvideoplayer.presentation.videoList.VideoUi
+import ru.pugovishnikova.example.vkvideoplayer.presentation.videoList.toVideoUi
 import ru.pugovishnikova.example.vkvideoplayer.util.Result
+import ru.pugovishnikova.example.vkvideoplayer.util.map
 import javax.inject.Inject
 
 class VideoRepositoryImpl @Inject constructor(
     private val apiService: ApiService,
     private val videoDao: VideoDao
 ) : VideoRepository {
-    override suspend fun getVideos(): Result<List<Video>, NetworkError> = try {
+    override suspend fun getVideos(): Result<List<VideoUi>, NetworkError> = try {
         apiService.getVideos()
     } catch (e: Exception) {
         null
-    }.let { responseToResult(it) }
+    }.let { responseToResult(it).map { videos -> videos.map { video -> video.toVideoUi() } } }
 
     override suspend fun insertVideo(videoEntity: VideoEntity): Result<DatabaseSuccess, DataBaseError> {
         try {

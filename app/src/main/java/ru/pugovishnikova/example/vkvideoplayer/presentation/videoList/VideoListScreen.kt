@@ -2,14 +2,9 @@ package ru.pugovishnikova.example.vkvideoplayer.presentation.videoList
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
@@ -19,9 +14,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import ru.pugovishnikova.example.vkvideoplayer.util.Utils
 
 
@@ -33,8 +28,7 @@ fun VideoListScreen(
     modifier: Modifier = Modifier,
     viewModel: VideoViewModel
 ) {
-
-    if (state.isLoading) {
+    if (state.isFirstLoading) {
         Box(
             modifier = modifier
                 .fillMaxSize(),
@@ -42,33 +36,45 @@ fun VideoListScreen(
         ) {
             CircularProgressIndicator()
         }
-    } else if (!state.isError) {
-        TrackLazyList(state.videos, onAction, onClick, modifier)
     } else {
-        ReloadScreen(onClick = viewModel.reload)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+        ) {
+
+            TrackLazyList(state, onAction, onClick, modifier, viewModel)
+            Button(
+                onClick = { viewModel.reload(!state.isInDownloadScreen) },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(20.dp)
+            ) {
+                if (state.isInDownloadScreen) Text(text = Utils.getInternetString())
+                else Text(text = Utils.getDownloadString())
+            }
+        }
     }
 }
 
+
 @Composable
 fun TrackLazyList(
-    items: List<VideoUi>,
+    state: VideoState,
     onAction: (VideoAction) -> Unit,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: VideoViewModel
 ) {
-    Column(
-        modifier = Modifier
-            .statusBarsPadding()
-            .fillMaxSize()
-            .padding(horizontal = 10.dp, vertical = 10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+    val swipeRefreshState = rememberSwipeRefreshState(state.isLoading)
+    SwipeRefresh(
+        state = swipeRefreshState,
+        onRefresh = { viewModel.reload(state.isInDownloadScreen) }
     ) {
         LazyColumn(
             modifier = modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(items) { videoUi ->
+            items(state.videos) { videoUi ->
                 VideoList(
                     video = videoUi,
                     onClick = { onAction(VideoAction.OnVideoClick(videoUi, onClick)) },
@@ -79,33 +85,4 @@ fun TrackLazyList(
         }
     }
 }
-
-
-@Composable
-fun ReloadScreen(
-    onClick: (Boolean) -> Unit,
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .wrapContentHeight(Alignment.CenterVertically),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Button(onClick = { onClick(true) }) {
-            Text(text = Utils.getReloadString())
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Button({ onClick(false) }) {
-            Text(text = Utils.getDownloadString())
-        }
-    }
-}
-
-@Preview
-@Composable
-fun show() {
-    ReloadScreen { }
-}
-
-
 
