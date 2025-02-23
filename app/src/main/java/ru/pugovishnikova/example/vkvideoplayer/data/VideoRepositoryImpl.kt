@@ -9,7 +9,7 @@ import ru.pugovishnikova.example.vkvideoplayer.domain.util.DatabaseSuccess
 import ru.pugovishnikova.example.vkvideoplayer.domain.util.NetworkError
 import ru.pugovishnikova.example.vkvideoplayer.domain.util.responseToResult
 import ru.pugovishnikova.example.vkvideoplayer.presentation.videoList.VideoUi
-import ru.pugovishnikova.example.vkvideoplayer.presentation.videoList.toVideoUi
+import ru.pugovishnikova.example.vkvideoplayer.data.mappers.api.toVideoUi
 import ru.pugovishnikova.example.vkvideoplayer.util.Result
 import ru.pugovishnikova.example.vkvideoplayer.util.map
 import javax.inject.Inject
