@@ -114,6 +114,7 @@ fun ShowActions(
                 fontSize = 24.sp,
                 fontWeight = FontWeight.ExtraBold
             )
+            Spacer(modifier = Modifier.height(15.dp))
             Text(
                 text = state.selectedVideoUi.author,
                 fontSize = 20.sp,
