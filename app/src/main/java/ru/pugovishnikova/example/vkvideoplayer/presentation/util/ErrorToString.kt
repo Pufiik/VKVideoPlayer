@@ -30,6 +30,7 @@ fun DownloadError.toString(context: Context): String {
     val resId = when (this) {
         DownloadError.ALREADY_DOWNLOAD -> R.string.already_download
         DownloadError.NO_VIDEOS -> R.string.no_videos
+        DownloadError.NOT_DOWNLOAD_VIDEO -> R.string.not_download
     }
     return context.getString(resId)
 }

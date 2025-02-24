@@ -9,8 +9,9 @@
     <string name="database_success_insert">Видео успешно сохранено!</string>
     <string name="database_success_delete">Видео удалено из ваших скачанных</string>
     <string name="database_error_delete">Ошибка удаления</string>
-    <string name="no_fetching_video">Ошибка получения видео\n</string>
+    <string name="no_fetching_video">Ошибка получения видео</string>
     <string name="database_success_delete_all">Сохраненные видео успешно удалены. Кэш очищен</string>
     <string name="no_videos">У вас пока нет скачанных видео</string>
-    <string name="already_download">Видео уже есть в скачанных\n</string>
+    <string name="already_download">Видео уже есть в скачанных</string>
+    <string name="not_download">Видео нет в Ваших скачанных</string>
 </resources>

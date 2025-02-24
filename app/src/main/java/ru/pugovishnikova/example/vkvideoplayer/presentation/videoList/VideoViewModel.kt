@@ -148,7 +148,7 @@ class VideoViewModel @Inject constructor(
         }
     }
 
-    fun deleteVideo(video: VideoUi) {
+    private fun deleteVideo(video: VideoUi) {
         videoJob?.cancel()
         videoJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -193,7 +193,7 @@ class VideoViewModel @Inject constructor(
         }
     }
 
-    fun getVideoFromDatabase(id: String) {
+    fun tryCacheVideoFromDatabase(id: String) {
         videoJob?.cancel()
         videoJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -207,6 +207,24 @@ class VideoViewModel @Inject constructor(
                     )
                 }
                 cacheVideo(state.value.selectedVideoUi!!)
+            }
+        }
+    }
+
+    fun tryDeleteVideoFromDatabase(id: String) {
+        videoJob?.cancel()
+        videoJob = viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                useCases.getVideoFromDatabaseUseCase(id)
+            }.onSuccess {
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                    )
+                }
+               deleteVideo(state.value.selectedVideoUi!!)
+            }.onError {
+                _events.send(VideoListEvent.ErrorDownloadData(DownloadError.NOT_DOWNLOAD_VIDEO))
             }
         }
     }

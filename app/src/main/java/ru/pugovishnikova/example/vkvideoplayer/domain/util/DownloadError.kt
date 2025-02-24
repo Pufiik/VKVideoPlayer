@@ -4,6 +4,7 @@ import ru.pugovishnikova.example.vkvideoplayer.util.Error
 
 enum class DownloadError: Error {
     NO_VIDEOS,
-    ALREADY_DOWNLOAD
+    ALREADY_DOWNLOAD,
+    NOT_DOWNLOAD_VIDEO
 }
 

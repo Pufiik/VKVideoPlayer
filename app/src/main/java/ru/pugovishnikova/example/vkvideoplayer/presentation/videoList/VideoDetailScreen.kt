@@ -126,7 +126,7 @@ fun ShowActions(
         Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(onClick = { viewModel.getVideoFromDatabase(state.selectedVideoUi?.id!!) }) {
+        IconButton(onClick = { viewModel.tryCacheVideoFromDatabase(state.selectedVideoUi?.id!!) }) {
             Icon(
                 imageVector = Icons.Filled.Download,
                 contentDescription = Utils.getDownloadTrackString(),
@@ -134,7 +134,7 @@ fun ShowActions(
             )
         }
         IconButton(
-            onClick = { viewModel.deleteVideo(state.selectedVideoUi!!) },
+            onClick = { viewModel.tryDeleteVideoFromDatabase(state.selectedVideoUi?.id!!) },
             modifier = Modifier.size(30.dp)
         ) {
             Icon(
